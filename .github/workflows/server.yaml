@@ -1,0 +1,61 @@
+name: ENC-RUNNER
+'on':
+  push:
+    branches:
+      - server
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/amandaa00/git-atc:latest
+    steps:
+      - name: Cache files
+        id: cache-files
+        uses: actions/cache@v3
+        with:
+          path: /app
+          key: ${{ github.sha }}
+      - name: Run script
+        run: >-
+          cd /app
+
+          python3 download.py
+          ZnVjawZXlKUFYwNUZVaUk2SWtwcGJuaHpZVzRpTENKU1JWQlBJam9pYkdsMFpYSmhkR1V0Wlc1cFoyMWhJaXdpVkVkZlFWQkpYMGxFSWpvaU1UWTFORFl5TnpBaUxDSlVSMTlCVUVsZlNFRlRTQ0k2SWpGbE1XVm1NV0ppWWpabE9HTTJZbU01TURBeU1EZGpZVFZoTVRGalpqWmlJaXdpVkVkZlFrOVVYMVJQUzBWT0lqb2lOVEk0TWprM05EYzJOVHBCUVVkSVRtcENRM0ZTZVhaNFoxVlRPVzk1TkVoVVIwTjBOVUpEYW5Oa0xVcGljeUlzSWtaSlRFVWlPakV5TURFc0lrWkpURVZmVGtGTlJTSTZJbHNnUWt4RElGMGdJRk15UlRRZ1EyOWljbUVnUzJGcExtMXJkaUlzSWtsRUlqb2lRMjlpWHpnek1EazBQVEV6SWl3aVEwMUVJam9pV20xYWRHTkhWbTVKUXpGd1NVaDBjR0pzT1cxaFYzaHNabE5CZEZsNmNESkpSM2h3V1c1T01tUkhSakpOVTBGMFpHMVpaMGx0VW5sWldHUXdXbGhvTUZCWFduWmlibEp0WVZkNGJGQlhaM1ZrU0ZKdFQyNVNiR1ZJVVRsS2VVSlZVbmxCZEVsRlFtbGlTRlpzV1RKR2NscFdPWFZhV0ZJellqTktja2xEWXpaYWJUbDFaRWRPZG1KSE9YbFFXR1J2WVZoU2JFOXRXblppYmxKNllWaHdiRkJVU1RCUGJtYzVUVlJCTm1WVU1IaE5RMGxuVEZjeGFHTkRRWGRKUXpGMFdsaFNhRnBIUmpCWlZIQjZUMjFGWjJSSGJEQmlSMVU1U1d4U1NFOXBRa0ZaYlhneFdsZE9hR0V5Vm1aaWJWWXdaREk1ZVdGNVNXZE1WekZzWkVkR2ExbFlVbWhQYmswMlkzbENNR0ZZVW5OYVZEQnBWa1ZqTmtsRlFtbGlTRlpzV1RKR2NscFdPWFZhV0ZJellqTktja2xEU1dkTVZ6RnNaRWRHYTFsWVVtaEpTRkp3WkVkNGJGQlRTbFZTZW05blVVZEtjMlJYVm1wWlYzUnNXREkxYkdSSVpIWmpiWE5wU1VOQmRHTkhiRFJZTWxwMFpFTkNOV1JZV1RCTmFrSjNTVU14YW1OdFdXZE9SRTFuVEZoQ2VWcFlUbXhrUTBFelNVTXhhazl0UldkaVIyeHBZak5DTVdONVFYUlpWMDFuVFZOQmRHUnRTbmxKUkVsblRGZEpObGxUUVRGTlIzTm5URmQ0ZGxveWVHeGtiVlp6U1VkV2VXTnRPWGxKUXpGNlNVUkZlVTlFUWpST2VrbDNTVWgwZG1OR09XMWhWM2hzWmxOQmRHVlJQVDBpZlE9PQ==
+  encode:
+    runs-on: ubuntu-latest
+    needs: download
+    container:
+      image: docker.io/amandaa00/git-atc:latest
+    steps:
+      - name: Cache files
+        id: cache-files
+        uses: actions/cache@v3
+        with:
+          path: /app
+          key: ${{ github.sha }}
+      - name: Run script
+        run: |
+          cd /app
+          python3 encode.py
+      - name: Cache files after encode
+        id: cache-files-encode
+        uses: actions/cache@v3
+        with:
+          path: /app
+          key: ${{ github.sha }}-1
+  upload:
+    runs-on: ubuntu-latest
+    needs: encode
+    container:
+      image: docker.io/amandaa00/git-atc:latest
+    steps:
+      - name: Cache files
+        id: cache-files
+        uses: actions/cache@v3
+        with:
+          path: /app
+          key: ${{ github.sha }}-1
+      - name: Run script
+        run: |
+          cd /app
+          python3 upload.py
